@@ -1,0 +1,16 @@
+Twitter API Keys:
+
+
+API Key
+
+ao3NdW3B0zDSSOJ5XHki6KglU
+
+API Key Secret
+
+QNNWTDTiehLm0BHPhl0cZ73L68f44FawRllmThOyZEdiVb134M
+
+Bearer Token
+
+AAAAAAAAAAAAAAAAAAAAAA12igEAAAAA13UdaNrYNO98YpjT6wtRF1OBW98%3DrejB5myNUACkP3WVitoXJsxdgB6kXBflTovQi2lbhoyx5EyPzG
+
+--------------------End Of File------------------------------
