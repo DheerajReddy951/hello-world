@@ -1,0 +1,314 @@
+
+Search Medium
+Write
+Sign up
+
+Sign In
+
+
+
+A map to illustrate exploration
+Things we learned integrating Data Exploration with D-Tale
+Lucas BERGOGNON
+Scalian
+Lucas BERGOGNON
+
+·
+Follow
+
+Published in
+Scalian
+
+·
+5 min read
+·
+Feb 18, 2021
+9
+
+
+
+
+
+In the last project I was working on, we needed to provide to the client different types of analyses in order to detect anomalies on an existing application. Those analyses were doing their job just fine, but what if the data evolved and new type of anomalies emerged? What if the client just got curious and wanted to look at the data themself? Maybe find a new type of anomalies without having to rely on an external team?
+
+We decided the best solution to this problem was to provide a data exploration tool. Our requirements were:
+
+The client must be able to visualize data coming from different tables of our database
+The client should be able to display it in multiple ways (tables, charts, statistics… the more the better !)
+It should integrate easily with our Django backend
+It must not take a lot of development time
+We looked at the classic pandas, matplotlib, seaborn, etc., but these solutions made writing code necessary. The process would have been too complicated to be useful: write code, rebuild docker image, deploy to the kubernetes cluster, explore your data, come to the conclusion that this is not exactly what you wanted to see, rinse and repeat…
+
+We obviously needed something more dynamic. Perhaps a JS charting library on our frontend, with custom API endpoints for querying the data? Well if you can allow custom type of charts, make different endpoints with different queries for different tables, and all in a few days of work, contact us and we’ll probably hire you ;). The project was almost at its end and it was too much work for the amount of time we had left.
+
+Finally, we found D-Tale.
+
+A D-Tale chart with D-Tale logo on it
+For more information : https://towardsdatascience.com/introduction-to-d-tale-5eddd81abe3f
+From the project’s github :
+
+D-Tale is the combination of a Flask back-end and a React front-end to bring you an easy way to view and analyze Pandas data structures. It integrates seamlessly with ipython notebooks and python/ipython terminals. Currently, this tool supports Pandas objects such as DataFrame, Series, MultiIndex, DatetimeIndex & RangeIndex
+
+It provides all features we needed and much more. This article will not list or present D-Tale’s features. There are already many articles doing that.
+
+I was tasked to integrate D-Tale in our solution. I developed a page where the user could go through a small process to select the data to be displayed, an algorithm to structure the data in a certain way, and finally spawn a D-Tale server.
+
+A demo of the process to setup a data exploration server in our project
+Select the data you want to explore
+I was surprised by how simple it was. Once I had the dataframe ready, it only took me one line of python to start D-Tale, and a few to keep track of all the instances running.
+
+
+The actual line of code used
+Everything was working fine. The next step was to merge my branch and go through the CI pipeline. I was done, in less time than I had planned… at least I thought I was. We noticed that sometimes, the instances did not appear on our list. By refreshing the page, they randomly appeared, or not… Weird.
+
+We figured out there was a difference between the local environment (where we start Django directly) and the staging environment (where we serve our Django app through gunicorn and nginx). We had multiple gunicorn processes in staging and each D-Tale instance was bound to a randomly chosen one (so we didn’t see it if the next request went through a different process).
+
+So I read everything I could on the project’s documentation. It said specifically that we needed to set up a cache to share the data between the processes. Ah ! That must be that. After a few more hours to set it up, it still didn’t work. I felt totally hopeless: the feature was not usable, and I had no lead on how to fix this problem.
+
+I decided to open an issue on github and ask directly, even if I didn’t really expect a result. But it turned out Andrew Schonfeld (the author and main contributor) read my issue, took some time to understand what I wrote, and figured out the solution. And then in 15 minutes, everything worked as expected.
+
+Robert Downey Junior is so relieved
+That’s how I felt. Thanks Andrew !
+I think there are two important things to take from this story.
+
+First, it is very important to have a staging environment. Had we not set up this environment like in prod, the client would only have seen a broken feature. Here’s an article going more in depth about this subject.
+
+Second, I’m glad we chose a well-maintained open-source project. The solution to our problem was simple but it could have taken me a week to find out where the problem was coming from.
+
+In the end, we’re glad we chose D-Tale. It handles our data exploration needs perfectly and was easy to integrate.
+
+Want to know more ? ✏ Contact us (in french, or not)
+
+Lucas Bergognon is a fullstack developer at Scalian. Working in the AI team, he typically works on frontend, backend and devops.
+
+Data Science
+Data Exploration
+Python
+Data Visualization
+Data Analysis
+9
+
+
+
+
+Lucas BERGOGNON
+Scalian
+Written by Lucas BERGOGNON
+2 Followers
+·
+Writer for 
+Scalian
+
+Currently working as a fullstack engineer at Scalian. I’m curious and passionate about almost everything : IA, game development, music…
+
+Follow
+
+More from Lucas BERGOGNON and Scalian
+Deux bras robotiques dont les doigts se touchent, comme dans le tableau “La création d’Adam” de Michel-Ange
+Lucas BERGOGNON
+Lucas BERGOGNON
+
+in
+
+Scalian
+
+Comment l’intelligence artificielle va transformer le handicap
+Aujourd’hui, près d’un quart de la population française est concernée par le handicap. L’IA pourra les aider.
+9 min read
+·
+May 20, 2021
+8
+
+Récupération des données OpenStreetMap (OSM)
+Thomas Huraux
+Thomas Huraux
+
+in
+
+Scalian
+
+Récupération des données OpenStreetMap (OSM)
+La simulation des phénomènes spatiaux S01E02
+5 min read
+·
+Oct 16, 2020
+4
+
+YOLOV4 Partie 1: à la pointe de la détection d’objet.
+Maxime Carrere
+Maxime Carrere
+
+in
+
+Scalian
+
+YOLOV4 Partie 1: à la pointe de la détection d’objet.
+Dans cette série de deux articles, nous décryptons YOLOv4, un modèle de réseau de neurones dédié à la détection d’objets dans des images.
+8 min read
+·
+Oct 1, 2020
+12
+
+Deep SORT: ou comment suivre des objets dans une vidéo
+Andrea Cortesi
+Andrea Cortesi
+
+in
+
+Scalian
+
+Deep SORT: ou comment suivre des objets dans une vidéo
+Dans les dernières années, les modèles de traitement d’images basées sur des algorithmes de Deep Learning ont vu une croissance très forte…
+7 min read
+·
+Nov 5, 2020
+11
+
+See all from Lucas BERGOGNON
+See all from Scalian
+Recommended from Medium
+It’s Time to Say GoodBye to pd.read_csv() and pd.to_csv()
+Avi Chawla
+Avi Chawla
+
+in
+
+Towards Data Science
+
+It’s Time to Say GoodBye to pd.read_csv() and pd.to_csv()
+Discussing another major caveat of Pandas
+4 min read
+·
+May 26, 2022
+2.8K
+
+48
+
+Getting into data science after the pandemic
+Rômulo Peixoto
+Rômulo Peixoto
+
+in
+
+MLearning.ai
+
+Getting into data science after the pandemic
+Conjectures from someone outside of I.T.
+3 min read
+·
+Mar 15
+46
+
+Lists
+
+
+
+Predictive Modeling w/ Python
+20 stories
+·
+365 saves
+
+
+
+Coding & Development
+11 stories
+·
+161 saves
+Databricks role-based and specialty certification line-up.
+
+
+New_Reading_List
+174 stories
+·
+97 saves
+Principal Component Analysis for ML
+Time Series Analysis
+deep learning cheatsheet for beginner
+Practical Guides to Machine Learning
+10 stories
+·
+405 saves
+The Architecture of a Modern Startup
+Dmitry Kruglov
+Dmitry Kruglov
+
+in
+
+Better Programming
+
+The Architecture of a Modern Startup
+Hype wave, pragmatic evidence vs the need to move fast
+16 min read
+·
+Nov 7, 2022
+5.6K
+
+50
+
+5 Things I Wish I Knew Before My First Job as a Data Analyst
+MargaretEfron
+MargaretEfron
+
+in
+
+Learning Data
+
+5 Things I Wish I Knew Before My First Job as a Data Analyst
+I’m five months into my first Data Analyst job, and there are many surprises I wish someone had warned me about! I will list them below, so…
+5 min read
+·
+Aug 23
+625
+
+12
+
+Building a KPI dashboard in Streamlit using Python
+Cameron Jones
+Cameron Jones
+
+Building a KPI dashboard in Streamlit using Python
+A step-by-step guide to creating a data analyst portfolio project
+4 min read
+·
+May 6
+112
+
+Tableau dashboard featuring Udemy data.
+Zach Quinn
+Zach Quinn
+
+in
+
+Pipeline: Your Data Engineering Resource
+
+Creating The Dashboard That Got Me A Data Analyst Job Offer
+A walkthrough of the Udemy dashboard that got me a job offer from one of the biggest names in academic publishing.
+
+·
+9 min read
+·
+Dec 5, 2022
+1.4K
+
+20
+
+See more recommendations
+Help
+
+Status
+
+Writers
+
+Blog
+
+Careers
+
+Privacy
+
+Terms
+
+About
+
+Text to speech
+
+Teams
